@@ -264,11 +264,12 @@ def callibration():
 	for run in range(opts['runs']):
 		opts['tmp_run'] = run
 		opts['tmp_seed'] = opts['rng_seed'][run]
+		opts['tmp_data'] = ' '.join('bootstrapping_run{tmp_run:02d}/subsample*'format(**opts))
 		opts['tmp_error'] = ' '.join(opts['error'])
 		opts['legacy'] = args.legacy
 
 		job_desc['exec_pleione'] = '{python} -m pleione.{soft} --output {outfile} \
-			--model {model} --final {final} --steps {steps} --error {tmp_error} --data bootstrapping_run{tmp_run:02d}/subsample* \
+			--model {model} --final {final} --steps {steps} --error {tmp_error} --data {tmp_data} \
 			SIMULATOR --python {python} --slurm {slurm} \
 			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} \
 			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
