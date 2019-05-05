@@ -268,7 +268,7 @@ def callibration():
 		opts['legacy'] = args.legacy
 
 		job_desc['exec_pleione'] = '{python} -m pleione.{soft} --output {outfile} \
-			--model {model} --final {final} --steps {steps} --error="{tmp_error}" --data bootstrapping_run{tmp_run:02d}/subsample* \
+			--model {model} --final {final} --steps {steps} --error {tmp_error} --data bootstrapping_run{tmp_run:02d}/subsample* \
 			SIMULATOR --python {python} --slurm {slurm} \
 			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} \
 			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
@@ -354,4 +354,4 @@ if __name__ == '__main__':
 	bootstrapper()
 
 	# call pleione N times
- 	callibration()
+	callibration()
