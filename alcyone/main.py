@@ -350,6 +350,9 @@ def read_reports():
 	tmp = pandas.concat(tmp, keys = range(len(tmp)))
 	print(tmp.T)
 
+	with open('./report.txt', 'w') as outfile:
+		tmp.to_csv(outfile, sep = '\t')
+
 	return 0
 
 if __name__ == '__main__':
