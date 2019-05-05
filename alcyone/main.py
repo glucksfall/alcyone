@@ -340,13 +340,15 @@ def read_reports():
 	reports = []
 	for idx1 in range(opts['runs']):
 		reports.append(sorted(glob.glob('bootstrapping_run{:02d}/{:s}*'.format(idx1, opts['results'])))[-1])
-	print(reports)
 
+	tmp = []
 	for folder in reports:
 		last_outmodels = sorted(glob.glob(folder + '/{ranking}/*'.format(**opts)))[-1]
 		with open(last_outmodels, 'r') as infile:
-			data = pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python')
-		print(data.iloc[0,1])
+			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0,:])
+
+	tmp = pandas.concat(tmp)
+	print(tmp)
 
 	return 0
 
