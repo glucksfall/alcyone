@@ -345,7 +345,7 @@ def read_reports():
 	for folder in reports:
 		last_outmodels = sorted(glob.glob(folder + '/{ranking}/*'.format(**opts)))[-1]
 		with open(last_outmodels, 'r') as infile:
-			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0,:])
+			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0,:].T)
 
 	tmp = pandas.concat(tmp, keys = range(len(tmp)))
 	print(tmp)
