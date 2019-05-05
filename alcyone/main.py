@@ -277,7 +277,7 @@ def callibration():
 
 		# remove --slurm if not setted by the user
 		if opts['slurm'] is None:
-			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--slurm {slurm}'.format(**opts), '')
+			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--slurm {slurm} '.format(**opts), '')
 
 		# edit SIMULATOR to match user selection
 		if opts['soft'].lower() == 'bng2':
