@@ -264,7 +264,7 @@ def callibration():
 	for run in range(opts['runs']):
 		opts['tmp_run'] = run
 		opts['tmp_seed'] = opts['rng_seed'][run]
-		opts['tmp_data'] = ' '.join('bootstrapping_run{tmp_run:02d}/subsample*'.format(**opts))
+		opts['tmp_data'] = ' '.join(glob.glob('bootstrapping_run{tmp_run:02d}/subsample*'.format(**opts)))
 		opts['tmp_error'] = ' '.join(opts['error'])
 		opts['legacy'] = args.legacy
 
