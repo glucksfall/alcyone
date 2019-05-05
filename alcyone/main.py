@@ -238,7 +238,7 @@ def bootstrapper():
 		samples = pandas.concat(subsamples, keys = data.index.levels[0]).reorder_levels([1,0])
 
 		for idx2 in list(samples.index.levels[0]):
-			with open('./bootstrapping_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'rw') as outfile:
+			with open('./bootstrapping_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
 				tmp = samples.loc[idx2]
 
 				if opts['soft'] == 'kasim':
