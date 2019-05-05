@@ -345,10 +345,9 @@ def read_reports():
 	for folder in reports:
 		last_outmodels = sorted(glob.glob(folder + '/{ranking}/*'.format(**opts)))[-1]
 		with open(last_outmodels, 'r') as infile:
-			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, :].T)
+			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, :])
 
-	tmp = pandas.concat(tmp, axis = 1)
-	print(tmp.T)
+	tmp = pandas.concat(tmp, axis = 0)
 
 	with open('./report.txt', 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t')
