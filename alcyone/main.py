@@ -217,9 +217,9 @@ def bootstrapper():
 	# read input data ...
 	data = []
 	for infile in opts['data']:
-		with open(infile, 'r') as file:
+		with open(infile, 'r') as infile:
 			if opts['soft'] == 'kasim':
-				data.append(pandas.read_csv(file, delimiter = ',', header = 0, engine = 'python').set_index('[T]', drop = False).rename_axis(None, axis = 0).drop('[T]', axis = 1))
+				data.append(pandas.read_csv(infile, delimiter = ',', header = 0, engine = 'python').set_index('[T]', drop = False).rename_axis(None, axis = 0).drop('[T]', axis = 1))
 	# and concatenate data in a single dataframe
 	data = pandas.concat(data, keys = range(len(data))).reorder_levels([1,0])
 
@@ -245,7 +245,7 @@ def bootstrapper():
 					tmp.index.name = '[T]'
 					tmp.to_csv(outfile, sep = ',')
 
-	return 0
+	return data, samples
 
 def callibration():
 	job_desc = {
@@ -332,7 +332,21 @@ def callibration():
 	# calibrate with multiprocessing.Pool
 	else:
 		with multiprocessing.Pool(multiprocessing.cpu_count() - 1) as pool:
-			pool.map(parallelize, sorted(squeue), chunksize = opts['runs'])
+			pool.map(parallelize, sorted(squeue), chunksize = opts['runs']) # chunksize controls serialization of subprocesses
+
+	return 0
+
+def read_reports():
+	reports = []
+	for idx1 in range(opts['runs']):
+		reports.append(sorted(glob.glob('bootstrapping_run{:02d}'.format(idx1)))[-1])
+	print(reports)
+
+	for folder in reports:
+		last_outmodels = sorted(glob.glob(folder + ' '))[-1]
+		with open(last_outmodels, 'r') as infile:
+			data = pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python')
+		print(data.iloc[0,1])
 
 	return 0
 
@@ -352,7 +366,10 @@ if __name__ == '__main__':
 	safe_checks()
 
 	# write bootstrapped obvervations
-	bootstrapper()
+	#data, samples = bootstrapper()
 
 	# call pleione N times
-	callibration()
+	#callibration()
+
+	# read reports
+	read_reports()
