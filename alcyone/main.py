@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 '''
@@ -23,19 +22,19 @@ def safe_checks():
 	# check for simulators
 	if opts['soft'].lower() == 'bng2' and shutil.which(opts['bng2']) is None:
 		error_msg += 'BNG2 (at {:s}) can\'t be called to perform simulations.\n' \
-			'Check the path to BNG2.'.format(opts['bng2'])
+			'Check the path to BNG2.\n'.format(opts['bng2'])
 
 	elif opts['soft'].lower() == 'kasim' and shutil.which(opts['kasim']) is None:
 		error_msg += 'KaSim (at {:s}) can\'t be called to perform simulations.\n' \
-			'Check the path to KaSim.'.format(opts['kasim'])
+			'Check the path to KaSim.\n'.format(opts['kasim'])
 
 	elif opts['soft'].lower() == 'nfsim' and shutil.which(opts['nfsim']) is None:
 		error_msg += 'NFsim (at {:s}) can\'t be called to perform simulations.\n' \
-			'Check the path to NFsim.'.format(opts['nfsim'])
+			'Check the path to NFsim.\n'.format(opts['nfsim'])
 
 	elif opts['soft'].lower() == 'piskas' and shutil.which(opts['piskas']) is None:
 		error_msg += 'PISKaS (at {:s}) can\'t be called to perform simulations.\n' \
-			'Check the path to PISKaS.'.format(opts['piskas'])
+			'Check the path to PISKaS.\n'.format(opts['piskas'])
 
 	# check for slurm
 	if opts['slurm'] is not None or opts['slurm'] == '':
@@ -268,31 +267,29 @@ def callibration():
 		opts['tmp_error'] = ' '.join(opts['error'])
 		opts['legacy'] = args.legacy
 
-		job_desc['exec_pleione'] = '{python} -m pleione.{soft} \
+		job_desc['exec_pleione'] = '{python} -m pleione.{soft} --output {outfile} \
 			--model {model} --final {final} --steps {steps} --error="{tmp_error}" --data bootstrapping_run{tmp_run:02d}/subsample* \
-			--simulator --python {python} --slurm {slurm} \
+			SIMULATOR --python {python} --slurm {slurm} \
 			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} \
-			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} \
-			--dist {dist_type} --self {self_rec} --crit {crit_vals} --prec {par_fmt} --syntax {syntax} \
-			--output bootstrapping_run{tmp_run:02d}/{outfile} --results bootstrapping_run{tmp_run:02d}/{results} \
-			--parsets bootstrapping_run{tmp_run:02d}/{parsets} --rawdata bootstrapping_run{tmp_run:02d}/{rawdata} \
-			--fitness bootstrapping_run{tmp_run:02d}/{fitness} --ranking bootstrapping_run{tmp_run:02d}/{ranking} \
-			--legacy {legacy}'.format(**opts).replace('\t', '')
+			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
+			--results bootstrapping_run{tmp_run:02d}/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
+			--crit {crit_vals} --prec {par_fmt} --syntax {syntax} --legacy {legacy}'.format(**opts).replace('\t', '')
 
 		# remove --slurm if not setted by the user
 		if opts['slurm'] is None:
 			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--slurm {slurm}'.format(**opts), '')
 
-		# edit simulator to match user option
+		# edit SIMULATOR to match user selection
 		if opts['soft'].lower() == 'bng2':
-			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--simulator', '--bng2 {bng2}'.format(**opts))
+			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('SIMULATOR', '--bng2 {bng2}'.format(**opts))
 		elif opts['soft'].lower() == 'kasim':
-			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--simulator', '--kasim {kasim}'.format(**opts))
+			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('SIMULATOR', '--kasim {kasim}'.format(**opts))
 		elif opts['soft'].lower() == 'nfsim':
-			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--simulator', '--nfsim {nfsim}'.format(**opts))
+			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('SIMULATOR', '--nfsim {nfsim}'.format(**opts))
 		elif opts['soft'].lower() == 'piskas':
-			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('--simulator', '--piskas {piskas}'.format(**opts))
+			job_desc['exec_pleione'] = job_desc['exec_pleione'].replace('SIMULATOR', '--piskas {piskas}'.format(**opts))
 		print(job_desc['exec_pleione'])
+
 		# use SLURM Workload Manager
 		if opts['slurm'] is not None:
 			cmd = os.path.expanduser('sbatch --no-requeue -p {partition} -N {nodes} -c {ncpus} -n {ntasks} -o {null} -e {null} -J {job_name} \
