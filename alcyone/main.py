@@ -347,7 +347,7 @@ def read_reports():
 		with open(last_outmodels, 'r') as infile:
 			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, :].T)
 
-	tmp = pandas.concat(tmp, axis = 0)
+	tmp = pandas.concat(tmp, axis = 1)
 	print(tmp.T)
 
 	with open('./report.txt', 'w') as outfile:
