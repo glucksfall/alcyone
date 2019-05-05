@@ -343,7 +343,7 @@ def read_reports():
 	print(reports)
 
 	for folder in reports:
-		last_outmodels = sorted(glob.glob(folder + '{ranking}/*'.format(**opts)))[-1]
+		last_outmodels = sorted(glob.glob(folder + '/{ranking}/*'.format(**opts)))[-1]
 		with open(last_outmodels, 'r') as infile:
 			data = pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python')
 		print(data.iloc[0,1])
