@@ -355,8 +355,12 @@ def read_reports():
 	with open('./best_fitness_per_run.txt', 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
 
-	upper = opts['runs']*(1 - float(opts['alpha'])/2)
-	lower = opts['runs']*(float(opts['alpha'])/2) + 1
+	# wrong equations from https://arxiv.org/abs/1809.08321
+	#upper = opts['runs']*(1 - float(opts['alpha'])/2)
+	#lower = opts['runs']*(float(opts['alpha'])/2) + 1
+
+	upper = opts['runs']*(.5 + float(opts['alpha'])/2)
+	lower = opts['runs']*(.5 - float(opts['alpha'])/2)
 
 	print(upper, lower)
 
