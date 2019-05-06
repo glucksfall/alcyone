@@ -369,7 +369,7 @@ def read_reports():
 	exp_alpha = -(numpy.ceil(lower)/opts['runs'] - .5)*2
 
 	if exp_alpha < opts['alpha']:
-		print('Bootstrapping runs allow a maximum confidence interval of ' + exp_alpha)
+		print('Bootstrapping runs allow a maximum confidence interval of {}%'.format(exp_alpha*100))
 	else:
 		print('Bootstrapping runs allow at least confidence interval of ' + opts['alpha'])
 
