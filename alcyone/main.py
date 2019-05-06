@@ -352,7 +352,7 @@ def read_reports():
 
 	tmp = pandas.concat(tmp, axis = 1).T
 
-	with open('./best_fitness_per_run.txt', 'w') as outfile:
+	with open('./alcyone_{:s}_best_fitness_per_run.txt'.format(opts['systime']), 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
 
 	# wrong equations from https://arxiv.org/abs/1809.08321
@@ -368,15 +368,22 @@ def read_reports():
 	msg = ''
 	if exp_alpha < opts['alpha']:
 		msg += 'Bootstrapping runs allow a maximum confidence interval of {}%\n'.format(exp_alpha*100)
+		# Determine confidence interval
+		for index, par in enumerate(tmp.columns[2:]):
+			ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
+			ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
+			msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
+
 	else:
 		msg += 'Bootstrapping runs allow at least confidence interval of {}%\n'.format(opts['alpha']*100)
+		# Determine confidence interval. WARNING! Is this correct?
+		for index, par in enumerate(tmp.columns[2:]):
+			ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
+			ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
+			msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
 
-	for index, par in enumerate(tmp.columns[2:]):
-		ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
-		ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
-		msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
-
-	with open('./confidence_intervals.txt', 'w') as outfile:
+	# save report to file
+	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
 		outfile.write(msg)
 
 	return 0
@@ -397,10 +404,10 @@ if __name__ == '__main__':
 	safe_checks()
 
 	# write bootstrapped obvervations
-	#data, samples = bootstrapper()
+	bootstrapper()
 
 	# call pleione N times
-	#callibration()
+	callibration()
 
 	# read reports
 	read_reports()
