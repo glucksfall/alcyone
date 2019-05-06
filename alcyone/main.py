@@ -175,7 +175,7 @@ def ga_opts():
 		'runs'      : args.runs[0],
 		'nobs'      : args.nobs[0],
 		'soft'      : args.soft[0],
-		'alpha'     : args.alpha[0],
+		'alpha'     : args.alpha,
 		# pleione
 		# user defined options
 		'model'     : args.model[0],
