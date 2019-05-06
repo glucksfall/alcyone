@@ -365,15 +365,19 @@ def read_reports():
 	exp_alpha = (numpy.floor(upper)/opts['runs'] - .5)*2
 	exp_alpha = -(numpy.ceil(lower)/opts['runs'] - .5)*2
 
+	msg = ''
 	if exp_alpha < opts['alpha']:
-		print('Bootstrapping runs allow a maximum confidence interval of {}%'.format(exp_alpha*100))
+		msg += 'Bootstrapping runs allow a maximum confidence interval of {}%\n'.format(exp_alpha*100)
 	else:
-		print('Bootstrapping runs allow at least confidence interval of {}%'.format(opts['alpha']*100))
+		msg += 'Bootstrapping runs allow at least confidence interval of {}%\n'.format(opts['alpha']*100)
 
 	for index, par in enumerate(tmp.columns[2:]):
 		ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
 		ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
-		print(par, ci_lower, ci_upper)
+		msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
+
+	with open('./confidence_intervals.txt', 'w') as outfile:
+		outfile.write(msg)
 
 	return 0
 
