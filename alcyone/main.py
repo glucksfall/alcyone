@@ -363,6 +363,7 @@ def read_reports():
 	lower = opts['runs']*(.5 - float(opts['alpha'])/2)
 
 	print(upper, lower)
+	print(numpy.floor(upper), numpy.ceil(lower))
 
 	return 0
 
