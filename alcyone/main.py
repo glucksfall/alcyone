@@ -371,8 +371,8 @@ def read_reports():
 		print('Bootstrapping runs allow at least confidence interval of {}%'.format(opts['alpha']*100))
 
 	for par in tmp.columns[2:]:
-		ci_lower = tmp.sort_values(by = [par], ascending = True)[int(numpy.ceil(lower))]
-		ci_upper = tmp.sort_values(by = [par], ascending = True)[int(numpy.floor(upper)-1)]
+		ci_lower = tmp.sort_values(by = [par], ascending = True).loc[int(numpy.ceil(lower)), par]
+		ci_upper = tmp.sort_values(by = [par], ascending = True).loc[int(numpy.floor(upper)-1), par]
 		print(par, ci_lower, ci_upper)
 
 	return 0
