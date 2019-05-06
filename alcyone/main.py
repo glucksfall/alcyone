@@ -362,16 +362,18 @@ def read_reports():
 	upper = opts['runs']*(.5 + float(opts['alpha'])/2)
 	lower = opts['runs']*(.5 - float(opts['alpha'])/2)
 
-	print(upper, lower)
-	print(numpy.floor(upper), numpy.ceil(lower))
-
 	exp_alpha = (numpy.floor(upper)/opts['runs'] - .5)*2
 	exp_alpha = -(numpy.ceil(lower)/opts['runs'] - .5)*2
 
 	if exp_alpha < opts['alpha']:
 		print('Bootstrapping runs allow a maximum confidence interval of {}%'.format(exp_alpha*100))
 	else:
-		print('Bootstrapping runs allow at least confidence interval of ' + opts['alpha'])
+		print('Bootstrapping runs allow at least confidence interval of {}%'.format(opts['alpha']*100))
+
+	for par in tmp.columns[2:]:
+		ci_lower = tmp.sort_values(by = [par], ascending = True)[numpy.ceil(lower)]
+		ci_upper = tmp.sort_values(by = [par], ascending = True)[numpy.floor(upper)-1]
+		print(par, ci_lower, ci_upper)
 
 	return 0
 
