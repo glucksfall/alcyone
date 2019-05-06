@@ -248,7 +248,7 @@ def bootstrapper():
 					tmp.index.name = '[T]'
 					tmp.to_csv(outfile, sep = ',')
 
-	return data, samples
+	return 0
 
 def callibration():
 	job_desc = {
