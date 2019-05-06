@@ -95,6 +95,8 @@ def argsparser():
 	parser.add_argument('--runs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'number of bootstrapping runs')
 	parser.add_argument('--nobs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'number of replications to draw from original data')
 	parser.add_argument('--soft'   , metavar = 'str'  , type = str  , required = True , nargs = 1  , help = 'one of the compatible stochastic software: bng2, kasim4, nfsim, piskas')
+	# not required arguments for alcyone
+	parser.add_argument('--alpha'  , metavar = 'float', type = str  , required = False, default = '.95', nargs = 1, help = 'maximum confidence interval (depends on number of runs)')
 
 	# required arguments for pleione
 	parser.add_argument('--model'  , metavar = 'str'  , type = str  , required = True  , nargs = 1  , help = 'RBM with tagged variables to parameterize')
@@ -173,6 +175,7 @@ def ga_opts():
 		'runs'      : args.runs[0],
 		'nobs'      : args.nobs[0],
 		'soft'      : args.soft[0],
+		'alpha'     : args.alpha[0],
 		# pleione
 		# user defined options
 		'model'     : args.model[0],
@@ -349,8 +352,13 @@ def read_reports():
 
 	tmp = pandas.concat(tmp, axis = 1).T
 
-	with open('./report.txt', 'w') as outfile:
+	with open('./best_fitness_per_run.txt', 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
+
+	upper = opts['runs']*(1 - opts['alpha']/2)
+	lower = opts['runs']*(opts['alpha']/2) + 1
+
+	print(upper, lower)
 
 	return 0
 
