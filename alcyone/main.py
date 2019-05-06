@@ -92,7 +92,7 @@ def argsparser():
 	parser = argparse.ArgumentParser(description = 'Perform a bootstrapped calibration of a RBM employing a Genetic Algorithm.')
 
 	# required arguments for alcyone
-	parser.add_argument('--runs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'number of bootstrapping runs')
+	parser.add_argument('--runs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'even number of bootstrapping runs')
 	parser.add_argument('--nobs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'number of replications to draw from original data')
 	parser.add_argument('--soft'   , metavar = 'str'  , type = str  , required = True , nargs = 1  , help = 'one of the compatible stochastic software: bng2, kasim4, nfsim, piskas')
 	# not required arguments for alcyone
@@ -364,6 +364,9 @@ def read_reports():
 
 	print(upper, lower)
 	print(numpy.floor(upper), numpy.ceil(lower))
+
+	new_alpha = (numpy.floor(upper)/opts['runs'] - .5)*2
+	print(new_alpha)
 
 	return 0
 
