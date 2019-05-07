@@ -115,6 +115,7 @@ def argsparser():
 
 	# distribute computation with SLURM, otherwise with python multiprocessing API
 	parser.add_argument('--slurm'  , metavar = 'str'  , type = str  , required = False, default = None            , help = 'SLURM partition to use, default None')
+	parser.add_argument('--sbatch' , metavar = 'str'  , type = str  , required = False, default = ''              , help = 'explicit configuration for sbatch, e.g. --mem-per-cpu 5G')
 
 	# general options for pleione
 	parser.add_argument('--seeds'  , metavar = 'list' , type = int  , required = False, default = [], nargs = '+' , help = 'random number generator seeds, default empty list')
@@ -189,6 +190,7 @@ def ga_opts():
 		'nfsim'     : os.path.expanduser(args.nfsim), # nfsim only
 		'python'    : os.path.expanduser(args.python),
 		'slurm'     : args.slurm,
+		'others'    : args.sbatch,
 		'rng_seed'  : args.seeds,
 		'num_iter'  : args.iter,
 		'pop_size'  : args.inds,
@@ -257,6 +259,7 @@ def callibration():
 		'ncpus'     : 1,
 		'null'      : opts['null'],
 		'partition' : opts['slurm'],
+		'others'    : opts['others'],
 		'job_name'  : 'child_{:s}'.format(opts['systime']),
 		'stdout'    : 'stdout_{:s}.txt'.format(opts['systime']),
 		'stderr'    : 'stderr_{:s}.txt'.format(opts['systime']),
