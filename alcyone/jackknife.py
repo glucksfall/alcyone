@@ -218,9 +218,13 @@ def jackknifer():
 	for infile in opts['data']:
 		with open(infile, 'r') as infile:
 			if opts['soft'] == 'kasim':
-				data.append(pandas.read_csv(infile, delimiter = ',', header = 0, engine = 'python').set_index('[T]', drop = False).rename_axis(None, axis = 0).drop('[T]', axis = 1))
+				tmp = pandas.read_csv(infile, delimiter = ',', header = 0, engine = 'python') # read file
+				tmp = tmp.set_index('[T]', drop = False) # set index as the column [T]
+				tmp = tmp.rename_axis(None, axis = 0) # rename index name to None
+				tmp = tmp.drop('[T]', axis = 1) # remove column [T]
+				data.append(tmp)
 	# and concatenate data in a single dataframe
-	data = pandas.concat(data, keys = range(len(data))).reorder_levels([1,0])
+	data = pandas.concat(data, keys = range(len(data)))
 
 	# save new experimental data to subdirectories
 	for idx1, _ in enumerate(opts['data']):
@@ -234,10 +238,11 @@ def jackknifer():
 		for idx2 in list(data.index.levels[0]):
 			if idx1 != idx2:
 				subsamples.append(data.loc[idx2])
+		samples = pandas.concat(subsamples, keys = range(len(data)-1))
 
 		for idx2 in list(subsamples.index.levels[0]):
 			with open('./jackknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
-				tmp = subsamples.loc[idx2]
+				tmp = samples.loc[idx2]
 
 				if opts['soft'] == 'kasim':
 					tmp.index.name = '[T]'
