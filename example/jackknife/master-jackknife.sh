@@ -11,11 +11,11 @@
 #SBATCH --output=stdout.txt
 #SBATCH --error=stderr.txt
 
-export PYTHONPATH="$PYTHONPATH:$HOME/opt/github-repositories/alcyone.glucksfall"
-export PYTHONPATH="$PYTHONPATH:$HOME/opt/github-repositories/pleione.glucksfall"
+export PYTHONPATH="$PYTHONPATH:$HOME/opt/repositories/git-reps/alcyone.glucksfall"
+export PYTHONPATH="$PYTHONPATH:$HOME/opt/repositories/git-reps/pleione.glucksfall"
 
-python3 -m alcyone.main --soft kasim \
+python3 -m alcyone.jackknife --soft kasim \
 --model ../model.kappa --data ../cold_stress_* --final 90 --steps 10 --syntax=3 \
 --error CHISQ \
---seeds 0 1 2 3 \
+--seeds 0 1 2 \
 --python /usr/bin/python3 --slurm spica
