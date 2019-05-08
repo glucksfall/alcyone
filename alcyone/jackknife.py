@@ -223,7 +223,7 @@ def jackknifer():
 	data = pandas.concat(data, keys = range(len(data))).reorder_levels([1,0])
 
 	# save new experimental data to subdirectories
-	for idx1, infile in enumerate(opts['data']):
+	for idx1, in enumerate(opts['data']):
 		try:
 			os.mkdir('jackknife_run{:02d}'.format(idx1))
 		except:
@@ -260,7 +260,7 @@ def callibration():
 
 	# submit simulations to the queue
 	squeue = []
-	for run in range(opts['runs']):
+	for run, in enumerate(opts['data']):
 		opts['tmp_run'] = run
 		opts['tmp_seed'] = opts['rng_seed'][run]
 		opts['tmp_data'] = ' '.join(glob.glob('bootstrapping_run{tmp_run:02d}/subsample*'.format(**opts)))
