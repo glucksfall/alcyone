@@ -236,7 +236,7 @@ def jackknifer():
 				subsamples.append(data.loc[idx2])
 
 		for idx2 in list(subsamples.index.levels[0]):
-			with open('./jakknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
+			with open('./jackknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
 				tmp = samples.loc[idx2]
 
 				if opts['soft'] == 'kasim':
@@ -263,7 +263,7 @@ def callibration():
 	for run, _ in enumerate(opts['data']):
 		opts['tmp_run'] = run
 		opts['tmp_seed'] = opts['rng_seed'][run]
-		opts['tmp_data'] = ' '.join(glob.glob('bootstrapping_run{tmp_run:02d}/subsample*'.format(**opts)))
+		opts['tmp_data'] = ' '.join(glob.glob('jackknife_run{tmp_run:02d}/subsample*'.format(**opts)))
 		opts['tmp_error'] = ' '.join(opts['error'])
 		opts['legacy'] = args.legacy
 
@@ -272,7 +272,7 @@ def callibration():
 			SIMULATOR --python {python} --slurm {slurm} \
 			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} \
 			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
-			--results bootstrapping_run{tmp_run:02d}/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
+			--results jackknife_run{tmp_run:02d}/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
 			--crit {crit_vals} --prec {par_fmt} --syntax {syntax} --legacy {legacy}'.format(**opts).replace('\t', '')
 
 		# remove --slurm if not setted by the user
