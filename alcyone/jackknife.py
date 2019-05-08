@@ -158,13 +158,6 @@ def argsparser():
 			parser.error('--dev requires --crit file')
 		args.crit = 'dummy-file.txt' # the file is not read by the error calculation script
 
-	if len(args.seeds) < args.runs[0]:
-		if sys.platform.startswith('linux'):
-			for idx in range(len(args.seeds), args.runs[0]):
-				args.seeds.append(int.from_bytes(os.urandom(4), byteorder = 'big'))
-		else:
-			parser.error('pleione requires --seed list of integers equal to the number of runs')
-
 	if args.legacy and args.dist == 'inverse':
 		parser.error('legacy uses the random standard library that don\'t support a non-uniform random choice.\n' \
 			'Please delete legacy or set to False.')
