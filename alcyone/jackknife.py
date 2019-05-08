@@ -237,7 +237,7 @@ def jackknifer():
 
 		for idx2 in list(subsamples.index.levels[0]):
 			with open('./jackknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
-				tmp = samples.loc[idx2]
+				tmp = subsamples.loc[idx2]
 
 				if opts['soft'] == 'kasim':
 					tmp.index.name = '[T]'
