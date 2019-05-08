@@ -68,6 +68,10 @@ def safe_checks():
 				error_msg += 'The "{:s}" file cannot be opened.\n' \
 					'Please, check the path to the data file.\n'.format(data)
 
+	# check Alcyone options
+	if opts['alpha'] > 1.0:
+		error_msg += 'Confidence interval probability must be a float between zero and one.\n'
+
 	# check GA options
 	if opts['mut_swap'] > 1.0:
 		error_msg += 'Parameter swap (or recombination) probability must be a float between zero and one.\n'
@@ -96,7 +100,7 @@ def argsparser():
 	parser.add_argument('--nobs'   , metavar = 'int'  , type = int  , required = True , nargs = 1  , help = 'number of replications to draw from original data')
 	parser.add_argument('--soft'   , metavar = 'str'  , type = str  , required = True , nargs = 1  , help = 'one of the compatible stochastic software: bng2, kasim4, nfsim, piskas')
 	# not required arguments for alcyone
-	parser.add_argument('--alpha'  , metavar = 'float', type = float, required = False, default = 0.95, nargs = 1,  help = 'maximum confidence interval (depends on number of runs)')
+	parser.add_argument('--alpha'  , metavar = 'float', type = float, required = False, default = 0.95, nargs = 1 ,  help = 'maximum confidence interval (depends on the number of runs)')
 
 	# required arguments for pleione
 	parser.add_argument('--model'  , metavar = 'str'  , type = str  , required = True  , nargs = 1  , help = 'RBM with tagged variables to parameterize')
@@ -353,7 +357,7 @@ def read_reports():
 		with open(last_outmodels, 'r') as infile:
 			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, 0:-1])
 
-	tmp = pandas.concat(tmp, axis = 1).T
+	tmp = pandas.concat(tmp, axis = 1).T.reset_index()
 
 	with open('./alcyone_{:s}_best_fitness_per_run.txt'.format(opts['systime']), 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
@@ -370,20 +374,15 @@ def read_reports():
 
 	msg = ''
 	if exp_alpha < opts['alpha']:
-		msg += 'Bootstrapping runs allow a maximum confidence interval of {}%\n'.format(exp_alpha*100)
-		# Determine confidence interval
-		for index, par in enumerate(tmp.columns[2:]):
-			ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
-			ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
-			msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
-
+		msg += 'Bootstrapping runs allow {:.2f} confidence intervals.%\n'.format(exp_alpha*100)
 	else:
-		msg += 'Bootstrapping runs allow at least confidence interval of {}%\n'.format(opts['alpha']*100)
-		# Determine confidence interval. WARNING! Is this correct?
-		for index, par in enumerate(tmp.columns[2:]):
-			ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
-			ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
-			msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
+		msg += 'Bootstrapping runs allow {:.2f} confidence intervals.%\n'.format(opts['alpha']*100)
+
+	# Determine confidence interval
+	for index, par in enumerate(tmp.columns[2:]):
+		ci_lower = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.ceil(lower)), index + 2]
+		ci_upper = tmp.sort_values(by = [par], ascending = True).iloc[int(numpy.floor(upper)-1), index + 2]
+		msg += '{:s}\t{:f}\t{:f}\n'.format(par, ci_lower, ci_upper)
 
 	# save report to file
 	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
