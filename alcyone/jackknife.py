@@ -232,7 +232,7 @@ def jackknifer():
 		# select observations with replacement ...
 		subsamples = []
 		for idx2 in list(data.index.levels[0]):
-			subsamples.append(data.loc[~idx2])
+			subsamples.append(data.loc[~data.index.isin(idx2)])
 
 		for idx2 in list(subsamples.index.levels[0]):
 			with open('./jakknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
