@@ -223,7 +223,7 @@ def jackknifer():
 	data = pandas.concat(data, keys = range(len(data))).reorder_levels([1,0])
 
 	# save new experimental data to subdirectories
-	for idx1 in range(opts['runs']):
+	for idx1, infile in enumerate(opts['data']):
 		try:
 			os.mkdir('jackknife_run{:02d}'.format(idx1))
 		except:
