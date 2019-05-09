@@ -227,26 +227,21 @@ def jackknifer():
 	data = pandas.concat(data, keys = range(len(data)))
 
 	# save new experimental data to subdirectories
-	for idx1, _ in enumerate(opts['data']):
+	for idx1 in list(data.index.levels[0]):
 		try:
 			os.mkdir('jackknife_run{:02d}'.format(idx1))
 		except:
-			continue
+			pass
 
 		# select observations one-leave-out
-		subsamples = []
 		for idx2 in list(data.index.levels[0]):
 			if idx1 != idx2:
-				subsamples.append(data.loc[idx2])
-		samples = pandas.concat(subsamples, keys = range(len(data)-1))
+				with open('./jackknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
+					tmp = data.loc[idx2]
 
-		for idx2 in list(subsamples.index.levels[0]):
-			with open('./jackknife_run{:02d}/subsample_{:02d}.txt'.format(idx1, idx2), 'w+') as outfile:
-				tmp = samples.loc[idx2]
-
-				if opts['soft'] == 'kasim':
-					tmp.index.name = '[T]'
-					tmp.to_csv(outfile, sep = ',')
+					if opts['soft'] == 'kasim':
+						tmp.index.name = '[T]'
+						tmp.to_csv(outfile, sep = ',')
 
 	return 0
 
