@@ -309,7 +309,7 @@ def callibration():
 	if opts['slurm'] is not None:
 		# edit dependencies to make pleione runs in series
 		for job_id in range(1, len(squeue)): # job 0 must have no dependencies
-			cmd = os.path.expanduser('scontrol update jobid={:d} dependency=afterok:{:d}'.format(squeue[job_id], squeue[job_id-1]))
+			cmd = os.path.expanduser('scontrol update jobid={:s} dependency=afterok:{:s}'.format(squeue[job_id], squeue[job_id-1]))
 			cmd = re.findall(r'(?:[^\s,"]|"+(?:=|\\.|[^"])*"+)+', cmd)
 			out, err = subprocess.Popen(cmd, shell = False, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 
