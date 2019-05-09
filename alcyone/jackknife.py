@@ -358,9 +358,9 @@ def read_reports():
 	for index, par in enumerate(tmp.columns[2:]):
 		avrg = 0
 		stdv = 0
-		for val in tmp.loc[par]:
+		for val in tmp.loc[:, par]:
 			avrg += val/len(opts['data'])
-		for val in tmp.loc[par]:
+		for val in tmp.loc[:, par]:
 			stdv += (val - avrg)**2
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
 		stdv = stvd**0.5
