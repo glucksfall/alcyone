@@ -351,10 +351,24 @@ def read_reports():
 	with open('./alcyone_{:s}_best_fitness_per_run.txt'.format(opts['systime']), 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
 
-	# WARNING: TODO unbiased estimation of the parameter value bias
+	# jackknife: derive an estimate of bias and standard error
+	# the Jackknife estimator above is an unbiased estimator of the variance of the sample mean
 
-	#with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
-		#outfile.write(msg)
+	msg = ''
+	for index, par in enumerate(tmp.columns[2:]):
+		avrg = 0
+		stdv = 0
+		for val in tmp.loc[par]:
+			avrg += val/len(opts['data'])
+		for val in tmp.loc[par]:
+			stdv += (val - avrg)**2
+		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
+		stdv = stvd**0.5
+
+		msg += '{:s}\tmean: {:f}\tci: {:f}'.format(par, avrg, stdv)
+
+	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
+		outfile.write(msg)
 
 	return 0
 
