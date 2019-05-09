@@ -337,7 +337,7 @@ def callibration():
 
 def read_reports():
 	reports = []
-	for idx1 in range(opts['runs']):
+	for idx1 in range(len(opts['data'])):
 		reports.append(sorted(glob.glob('jackknife_run{:02d}/{:s}*'.format(idx1, opts['results'])))[-1])
 
 	tmp = []
@@ -374,10 +374,10 @@ if __name__ == '__main__':
 	safe_checks()
 
 	# write bootstrapped obvervations
-	jackknifer()
+	#jackknifer()
 
 	# call pleione N times
-	callibration()
+	#callibration()
 
 	# read reports
 	read_reports()
