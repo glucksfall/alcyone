@@ -346,7 +346,7 @@ def read_reports():
 		with open(last_outmodels, 'r') as infile:
 			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, 0:-1])
 
-	tmp = pandas.concat(tmp, axis = 1).T
+	tmp = pandas.concat(tmp, axis = 1).T.reset_index(drop = True)
 
 	with open('./alcyone_{:s}_best_fitness_per_run.txt'.format(opts['systime']), 'w') as outfile:
 		tmp.to_csv(outfile, sep = '\t', index = False)
@@ -358,7 +358,7 @@ def read_reports():
 	for index, par in enumerate(tmp.columns[2:]):
 		avrg = 0
 		stdv = 0
-		for val in tmp.iloc[index].loc[par]:
+		for val in tmp.loc[par]:
 			avrg += val/len(opts['data'])
 		for val in tmp.loc[par]:
 			stdv += (val - avrg)**2
