@@ -363,7 +363,7 @@ def read_reports():
 		for val in tmp.loc[:, par]:
 			stdv += (val - avrg)**2
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
-		stdv = stvd**0.5
+		stdv = stdv**0.5
 
 		msg += '{:s}\tmean: {:f}\tci: {:f}'.format(par, avrg, stdv)
 
