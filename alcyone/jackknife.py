@@ -365,7 +365,7 @@ def read_reports():
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
 		stdv = stdv**0.5
 
-		msg += '{:s}\tmean: {:f}\tci: {:f}'.format(par, avrg, stdv)
+		msg += '{:s}\tmean: {:f}\tci: {:f}\n'.format(par, avrg, stdv)
 
 	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
 		outfile.write(msg)
