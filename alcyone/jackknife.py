@@ -357,9 +357,11 @@ def read_reports():
 	msg = ''
 	for index, par in enumerate(tmp.columns[2:]):
 		avrg = 0
-		stdv = 0
 		for val in tmp.loc[:, par]:
-			avrg += val/len(opts['data'])
+			avrg += val
+		avrg = avrg/len(opts['data'])
+
+		stdv = 0
 		for val in tmp.loc[:, par]:
 			stdv += (val - avrg)**2
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
@@ -388,10 +390,10 @@ if __name__ == '__main__':
 	safe_checks()
 
 	# write bootstrapped obvervations
-	#jackknifer()
+	jackknifer()
 
 	# call pleione N times
-	#callibration()
+	callibration()
 
 	# read reports
 	read_reports()
