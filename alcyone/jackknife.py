@@ -315,7 +315,7 @@ def callibration():
 
 		# release jobs
 		for job_id in range(len(squeue)):
-			cmd = os.path.expanduser('scontrol release jobid={:d}'.format(squeue[job_id]))
+			cmd = os.path.expanduser('scontrol release jobid={:s}'.format(squeue[job_id]))
 			cmd = re.findall(r'(?:[^\s,"]|"+(?:=|\\.|[^"])*"+)+', cmd)
 			out, err = subprocess.Popen(cmd, shell = False, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 
