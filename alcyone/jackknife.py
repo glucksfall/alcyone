@@ -158,8 +158,22 @@ def argsparser():
 			parser.error('--dev requires --crit file')
 		args.crit = 'dummy-file.txt' # the file is not read by the error calculation script
 
+	seeds = len(args.data)
+	if args.bias:
+		seeds += 1
+
+	if len(args.seeds) < seeds:
+		if sys.platform.startswith('linux'):
+			for idx in range(len(args.seeds), seeds):
+				args.seeds.append(int.from_bytes(os.urandom(4), byteorder = 'big'))
+		else:
+			parser.error('pleione requires --seed list of integers equal to the number of replications')
+
+	while len(args.seeds) > seeds:
+		args.seeds.pop()
+
 	if args.legacy and args.dist == 'inverse':
-		parser.error('legacy uses the random standard library that don\'t support a non-uniform random choice.\n' \
+		parser.error('legacy uses the random standard library that don\'t support a non-uniform random choice used by inverse.\n' \
 			'Please delete legacy or set to False.')
 
 	return args
@@ -264,7 +278,7 @@ def calibration():
 	job_scripts = []
 	# append a baseline calibration
 	if opts['bias']:
-		opts['tmp_seed'] = opts['seed'][-1] # safe_check should add or prune integers
+		opts['tmp_seed'] = opts['rng_seed'][-1]
 		opts['tmp_error'] = ' '.join(opts['error'])
 
 		job_scripts.append(
