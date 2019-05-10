@@ -279,11 +279,12 @@ def calibration():
 	# append a baseline calibration
 	if opts['bias']:
 		opts['tmp_seed'] = opts['rng_seed'][-1]
+		opts['tmp_data'] = ' '.join(opts['data'])
 		opts['tmp_error'] = ' '.join(opts['error'])
 
 		job_scripts.append(
 			'{python} -m pleione.{soft} --output {outfile} SIMULATOR --python {python} --slurm {slurm} \
-			--model {model} --final {final} --steps {steps} --error {error} --data {data} \
+			--model {model} --final {final} --steps {steps} --error {error} --data {tmp_data} \
 			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} --seed {tmp_seed} \
 			--swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
 			--results baseline/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
