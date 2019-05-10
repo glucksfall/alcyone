@@ -278,6 +278,11 @@ def calibration():
 	job_scripts = []
 	# append a baseline calibration
 	if opts['bias']:
+		try:
+			os.mkdir('baseline')
+		except:
+			pass
+
 		opts['tmp_seed'] = opts['rng_seed'][-1]
 		opts['tmp_data'] = ' '.join(opts['data'])
 		opts['tmp_error'] = ' '.join(opts['error'])
