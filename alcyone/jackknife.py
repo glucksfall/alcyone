@@ -390,7 +390,7 @@ def read_reports():
 
 	if args.bias:
 		baseline = sorted(glob.glob('./baseline/{:s}*'.format(opts['results'])))[-1]
-		last_outmodel = sorted(baseline + '/{ranking}/*'.format(**opts))[-1]
+		last_outmodel = sorted(glob.glob(baseline + '/{ranking}/*'.format(**opts)))[-1]
 		with open(last_outmodel, 'r') as infile:
 			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, 0:-1])
 
