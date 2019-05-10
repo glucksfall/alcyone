@@ -407,19 +407,26 @@ def read_reports():
 		avrg = 0
 		for val in tmp.loc[0:len(opts['data']), par]:
 			avrg += val
+		# empirical average
 		avrg = avrg/len(opts['data'])
 
 		stdv = 0
 		for val in tmp.loc[0:len(opts['data']), par]:
 			stdv += (val - avrg)**2
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
+		# jackknife standard error
 		stdv = stdv**0.5
 
 	if not args.bias:
-		msg += '{:s}\tmean: {:f}\tci: {:f}\n'.format(par, avrg, stdv)
+		msg += '{:s}\tmean: {:f}\tSE: {:s}{:f}\n'.format(par, avrg, r'$pm$', stdv)
 	else:
-		bias = (len(opts['data']) - 1) * (avrg - tmp.loc[len(opts['data']) + 1, par])
-		msg += '{:s}\tmean: {:f}\tci: {:f}\tbias: {:f}\n'.format(par, avrg, stdv, bias)
+		# estimator based on all observations
+		theta = tmp.loc[len(opts['data']) + 1, par]
+		# jackknife bias
+		bias = (len(opts['data']) - 1) * (avrg - theta)
+		# jackknife estimate of the paremeter of interest: n * theta - (n - 1) * empirical average
+		jack = n * theta - (len(opts['data']) - 1) * avrg
+		msg += '{:s}\tjack: {:f}\tmean: {:f}\tSE: {:s}{:f}\tbias: {:f}\n'.format(par, jack, avrg, r'$pm$', stdv, bias)
 
 	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
 		outfile.write(msg)
