@@ -388,6 +388,12 @@ def read_reports():
 		with open(last_outmodels, 'r') as infile:
 			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, 0:-1])
 
+	if args.bias:
+		baseline = sorted(glob.glob('./baseline/{:s}*'.format(opts['results'])))[-1]
+		last_outmodel = sorted(baseline + '/{ranking}/*'.format(**opts))[-1]
+		with open(last_outmodel, 'r') as infile:
+			tmp.append(pandas.read_csv(infile, delimiter = '\t', skiprows = 4, header = 0, engine = 'python').iloc[0, 0:-1])
+
 	tmp = pandas.concat(tmp, axis = 1).T.reset_index(drop = True)
 
 	with open('./alcyone_{:s}_best_fitness_per_run.txt'.format(opts['systime']), 'w') as outfile:
@@ -399,17 +405,21 @@ def read_reports():
 	msg = ''
 	for index, par in enumerate(tmp.columns[2:]):
 		avrg = 0
-		for val in tmp.loc[:, par]:
+		for val in tmp.loc[0:len(opts['data']), par]:
 			avrg += val
 		avrg = avrg/len(opts['data'])
 
 		stdv = 0
-		for val in tmp.loc[:, par]:
+		for val in tmp.loc[0:len(opts['data']), par]:
 			stdv += (val - avrg)**2
 		stdv = ((len(opts['data']) - 1)/len(opts['data'])) * stdv
 		stdv = stdv**0.5
 
+	if not args.bias:
 		msg += '{:s}\tmean: {:f}\tci: {:f}\n'.format(par, avrg, stdv)
+	else:
+		bias = (len(opts['data']) - 1) * (avrg - tmp.loc[len(opts['data']) + 1, par])
+		msg += '{:s}\tmean: {:f}\tci: {:f}\tbias: {:f}\n'.format(par, avrg, stdv, bias)
 
 	with open('./alcyone_{:s}_confidence_intervals.txt'.format(opts['systime']), 'w') as outfile:
 		outfile.write(msg)
