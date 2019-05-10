@@ -75,8 +75,8 @@ def safe_checks():
 	if opts['mut_rate'] > 1.0:
 		error_msg += 'Parameter mutation probability must be a float between zero and one.\n'
 
-	if opts['data'] == 3:
-		opts['']
+	#if opts['data'] == 3:
+		#opts['']
 
 	# print error
 	if error_msg != '':
@@ -94,18 +94,18 @@ def parallelize(cmd):
 def argsparser():
 	parser = argparse.ArgumentParser(description = 'Perform a jackknife resampling to calibrate a RBM employing Pleione.')
 
-	# required arguments for alcyone
-	parser.add_argument('--soft'   , metavar = 'str'  , type = str  , required = True , nargs = 1  , help = 'one of the compatible stochastic software: bng2, kasim4, nfsim, piskas')
-	# not required arguments for alcyone
-	parser.add_argument('--alpha'  , metavar = 'float', type = float, required = False, default = 0.95, nargs = 1,  help = 'maximum confidence interval (depends on number of runs)')
+	# required arguments for alcyone.jackknife
+	parser.add_argument('--soft'   , metavar = 'str'  , type = str  , required = True , nargs = 1                 , help = 'one of the compatible stochastic software: bng2, kasim4, nfsim, piskas')
+	# not required arguments for alcyone.jackknife
+	parser.add_argument('--bias'   , metavar = 'False', type = str  , required = False, default = False           , help = 'run a calibration against all replications to determine jackknife bias')
 
 	# required arguments for pleione
-	parser.add_argument('--model'  , metavar = 'str'  , type = str  , required = True , nargs = 1  , help = 'RBM with tagged variables to parameterize')
-	parser.add_argument('--final'  , metavar = 'float', type = str  , required = True , nargs = 1  , help = 'limit time to simulate')
-	parser.add_argument('--steps'  , metavar = 'float', type = str  , required = True , nargs = 1  , help = 'time steps to simulate')
+	parser.add_argument('--model'  , metavar = 'str'  , type = str  , required = True , nargs = 1                 , help = 'RBM with tagged variables to parameterize')
+	parser.add_argument('--final'  , metavar = 'float', type = str  , required = True , nargs = 1                 , help = 'limit time to simulate')
+	parser.add_argument('--steps'  , metavar = 'float', type = str  , required = True , nargs = 1                 , help = 'time steps to simulate')
 	# choose one or more fitness functions
-	parser.add_argument('--error'  , metavar = 'str'  , type = str  , required = True , nargs = '+', help = 'list of supported fit functions')
-	parser.add_argument('--data'   , metavar = 'str'  , type = str  , required = True , nargs = '+', help = 'data files to parameterize')
+	parser.add_argument('--error'  , metavar = 'str'  , type = str  , required = True , nargs = '+'               , help = 'list of supported fit functions')
+	parser.add_argument('--data'   , metavar = 'str'  , type = str  , required = True , nargs = '+'               , help = 'data files to parameterize')
 
 	# useful paths for simulators
 	parser.add_argument('--bng2'   , metavar = 'path' , type = str  , required = False, default = '~/bin/bng2'    , help = 'BioNetGen path, default ~/bin/bng2')
@@ -170,7 +170,7 @@ def ga_opts():
 		#'runs'      : args.runs[0], only bootstrapping
 		#'nobs'      : args.nobs[0], only bootstrapping
 		'soft'      : args.soft[0],
-		'alpha'     : args.alpha,
+		'bias'      : args.bias,
 		# pleione
 		# user defined options
 		'model'     : args.model[0],
@@ -206,6 +206,7 @@ def ga_opts():
 		'rawdata'   : args.rawdata,
 		'fitness'   : args.fitness,
 		'ranking'   : args.ranking,
+		'legacy'    : args.legacy,
 		# non-user defined options
 		'home'      : os.getcwd(),
 		'null'      : '/dev/null',
@@ -245,7 +246,8 @@ def jackknifer():
 
 	return 0
 
-def callibration():
+def calibration():
+	# create job scripts
 	job_desc = {
 		'nodes'     : 1,
 		'ntasks'    : 1,
@@ -258,22 +260,42 @@ def callibration():
 		'stderr'    : 'stderr_{:s}.txt'.format(opts['systime']),
 		}
 
-	# submit simulations to the queue
-	squeue = []
+	# create job scripts ...
+	job_scripts = []
+	# append a baseline calibration
+	if opts['bias']:
+		opts['tmp_seed'] = opts['seed'][-1] # safe_check should add or prune integers
+		opts['tmp_error'] = ' '.join(opts['error'])
+
+		job_scripts.append(
+			'{python} -m pleione.{soft} --output {outfile} SIMULATOR --python {python} --slurm {slurm} \
+			--model {model} --final {final} --steps {steps} --error {error} --data {data} \
+			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} --seed {tmp_seed} \
+			--swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
+			--results baseline/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
+			--crit {crit_vals} --prec {par_fmt} --syntax {syntax} --legacy {legacy}'.format(**opts).replace('\t', '')
+			)
+
+	# append jackknife samples
 	for run, _ in enumerate(opts['data']):
 		opts['tmp_run'] = run
 		opts['tmp_seed'] = opts['rng_seed'][run]
 		opts['tmp_data'] = ' '.join(glob.glob('jackknife_run{tmp_run:02d}/subsample*'.format(**opts)))
 		opts['tmp_error'] = ' '.join(opts['error'])
-		opts['legacy'] = args.legacy
 
-		job_desc['exec_pleione'] = '{python} -m pleione.{soft} --output {outfile} \
+		job_scripts.append(
+			'{python} -m pleione.{soft} --output {outfile} SIMULATOR --python {python} --slurm {slurm} \
 			--model {model} --final {final} --steps {steps} --error {tmp_error} --data {tmp_data} \
-			SIMULATOR --python {python} --slurm {slurm} \
-			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} \
-			--seed {tmp_seed} --swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
+			--iter {num_iter} --inds {pop_size} --sims {num_sims} --best {pop_best} --seed {tmp_seed} \
+			--swap {mut_swap} --rate {mut_rate} --cross {xpoints} --dist {dist_type} --self {self_rec} \
 			--results jackknife_run{tmp_run:02d}/{results} --parsets {parsets} --rawdata {rawdata} --fitness {fitness} --ranking {ranking} \
 			--crit {crit_vals} --prec {par_fmt} --syntax {syntax} --legacy {legacy}'.format(**opts).replace('\t', '')
+			)
+
+	# ... then submit simulations to the queue
+	squeue = []
+	for script in job_scripts:
+		job_desc['exec_pleione'] = script
 
 		# remove --slurm if not setted by the user
 		if opts['slurm'] is None:
@@ -328,7 +350,7 @@ def callibration():
 				time.sleep(1)
 				out, err = subprocess.Popen(cmd, shell = False, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 
-	# calibrate with multiprocessing.Pool
+	# run calibration with multiprocessing.Pool
 	else:
 		with multiprocessing.Pool(multiprocessing.cpu_count() - 1) as pool:
 			pool.map(parallelize, sorted(squeue), chunksize = opts['runs']) # chunksize controls serialization of subprocesses
@@ -392,8 +414,8 @@ if __name__ == '__main__':
 	# write bootstrapped obvervations
 	jackknifer()
 
-	# call pleione N times
-	callibration()
+	# call pleione N times (N equal to data replications)
+	calibration()
 
 	# read reports
 	read_reports()
