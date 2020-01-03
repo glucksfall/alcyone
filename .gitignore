@@ -11,7 +11,3 @@ build/
 
 # others
 Makefile
-MANIFEST.in
-setup.cfg
-setup.py
-versioneer.py
