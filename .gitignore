@@ -11,3 +11,4 @@ build/
 
 # others
 Makefile
+.ipynb_checkpoints
